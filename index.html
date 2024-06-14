@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #969393;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .player {
+            width: 100%;
+            height: auto;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #videoPlayer {
+            margin-bottom: 10px;
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .channel-list {
+            text-align: center;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .channel-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .channel-list li {
+            padding: 10px;
+            background-color: #e9e9e9;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .channel-list li:hover {
+            transform: scale(1.1);
+            background-color: #d9d9d9;
+        }
+        
+        .channel-list button:active {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IPTV Player</h1>
+        <div class="player">
+            <video id="videoPlayer" autoplay controls></video>
+        </div>
+        <div class="channel-list">
+            <ul id="channelList"></ul>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const channelListElement = document.getElementById('channelList');
+            const videoPlayer = document.getElementById('videoPlayer');
+            const playlistUrl = 'https://jeromelaliag.link/iptv/channel.m3u.php';
+
+            fetch(playlistUrl)
+                .then(response => response.text())
+                .then(data => {
+                    const channels = parseM3U(data);
+                    channels.forEach(channel => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = channel.name;
+                        listItem.setAttribute('data-url', channel.url);
+                        channelListElement.appendChild(listItem);
+                    });
+                });
+
+            function parseM3U(data) {
+                const lines = data.split('\n');
+                const channels = [];
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].startsWith('#EXTINF:')) {
+                        const info = lines[i].split(',');
+                        let name = info[1].trim();
+                        name = name.replace('(M3U IPTV app only)', ''); // Remove unwanted text
+                        const url = lines[++i].trim();
+                        channels.push({ name, url });
+                    }
+                }
+                return channels;
+            }
+
+            channelListElement.addEventListener('click', (event) => {
+                if (event.target.tagName === 'LI') {
+                    const url = event.target.getAttribute('data-url');
+                    videoPlayer.src = url;
+                    videoPlayer.play();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
