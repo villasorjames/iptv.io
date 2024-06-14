@@ -62,7 +62,7 @@
             transform: scale(1.1);
             background-color: #d9d9d9;
         }
-        
+
         .channel-list button:active {
             transform: scale(1.05);
         }
@@ -78,6 +78,7 @@
             <ul id="channelList"></ul>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const channelListElement = document.getElementById('channelList');
@@ -114,8 +115,17 @@
             channelListElement.addEventListener('click', (event) => {
                 if (event.target.tagName === 'LI') {
                     const url = event.target.getAttribute('data-url');
-                    videoPlayer.src = url;
-                    videoPlayer.play();
+                    if (Hls.isSupported()) {
+                        const hls = new Hls();
+                        hls.loadSource(url);
+                        hls.attachMedia(videoPlayer);
+                        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                            videoPlayer.play();
+                        });
+                    } else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                        videoPlayer.src = url;
+                        videoPlayer.play();
+                    }
                 }
             });
         });
