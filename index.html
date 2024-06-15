@@ -83,7 +83,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const channelListElement = document.getElementById('channelList');
             const videoPlayer = document.getElementById('videoPlayer');
-            const playlistUrl = 'https://jeromelaliag.link/iptv/channel.m3u.php';
+            const playlistUrl = 'https://villasorjames.github.io/iptv.io/iptv.m3u';
 
             fetch(playlistUrl)
                 .then(response => response.text())
@@ -104,7 +104,7 @@
                     if (lines[i].startsWith('#EXTINF:')) {
                         const info = lines[i].split(',');
                         let name = info[1].trim();
-                        name = name.replace('(M3U IPTV app only)', ''); // Remove unwanted text
+                        name = name.replace('(IPTV Player Only)', ''); // Remove unwanted text
                         const url = lines[++i].trim();
                         channels.push({ name, url });
                     }
